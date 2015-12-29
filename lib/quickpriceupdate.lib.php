@@ -53,3 +53,90 @@ function quickpriceupdateAdminPrepareHead()
 
     return $head;
 }
+
+function select_all_categories(&$form)
+{
+	global $langs;
+	$Tab = array(-1 => $langs->transnoentitiesnoconv('quickpriceupdate_selectCategory'), 0 => $langs->transnoentitiesnoconv('quickpriceupdate_selectAll'));
+	$Tab += $form->select_all_categories(0,'', 'fk_category', 64, 0, 1);
+	
+	return $form->selectarray('fk_category', $Tab);
+}
+
+
+function _priceUpdateDolibarr(&$db, &$conf, &$langs)
+{
+	dol_include_once('/product/class/product.class.php');
+	$error = 0;
+	
+	$fk_category = GETPOST('fk_category', 'int');
+	$tms = dol_mktime(GETPOST('tmshour', 'int'), GETPOST('tmsmin', 'int'), 0, GETPOST('tmsmonth', 'int'), GETPOST('tmsday', 'int'), GETPOST('tmsyear', 'int'));
+	$percentage = (float) GETPOST('percentage');
+	
+	if ($fk_category <= -1) 
+	{
+		setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentities('quickpriceupdate_category_required')), null, 'errors');
+		$error++;
+	}
+	
+	if ($tms == '') 
+	{
+		setEventMessages($langs->trans('ErrorFieldRequired', $langs->transnoentities('quickpriceupdate_date_required')), null, 'errors');
+		$error++;
+	}
+	
+	if (!$error && $percentage != 0)
+	{
+		$tms = date('Y-m-d H:i:00', $tms);
+		_priceUpdateDolibarrAction($db, $conf, $langs, $fk_category, $tms, $percentage);
+	}
+}
+
+function _priceUpdateDolibarrAction(&$db, &$conf, &$langs, $fk_category, $tms, $percentage)
+{
+	global $user;
+	
+	$sql = 'SELECT  pp.fk_product FROM '.MAIN_DB_PREFIX.'product_price pp';
+	if ($fk_category > 0) $sql .= ' INNER JOIN '.MAIN_DB_PREFIX.'categorie_product cp ON (cp.fk_product = pp.fk_product AND cp.fk_categorie = '.$fk_category.')';
+	$sql .= ' WHERE pp.tms >= ALL (SELECT pp2.tms FROM '.MAIN_DB_PREFIX.'product_price pp2 WHERE pp2.fk_product = pp.fk_product) AND pp.tms < "'.$tms.'"';
+	
+	$resql = $db->query($sql);
+	if ($resql)
+	{
+		$i=0;
+		while ($row = $db->fetch_object($resql))
+		{
+			$i += _updatePrice($db, $conf, $row, $user, $percentage);
+		}
+		
+		setEventMessages($langs->trans('quickpriceupdate_nb_priceupdate', $i), null);
+	}
+	else 
+	{
+		setEventMessages($langs->trans('quickpriceupdate_sql_error', $sql, $db->lasterror), null, 'errors');
+	}
+}
+
+/**
+ * return 1 if OK, 0 if KO
+ */
+function _updatePrice(&$db, &$conf, &$row, &$user, $percentage)
+{
+	$coef = 1 + ($percentage / 100);
+	if (!empty($conf->global->PRODUCT_PRICE_UNIQ))
+	{
+		$product = new Product($db);
+		if ($product->fetch($row->fk_product) > 0)
+		{
+			if ($product->type == 0 || !empty($conf->global->QUICKPRICEUPDATE_ALLOW_SERVICE))
+			{
+				$r = $product->updatePrice($product->price * $coef, 'HT', $user);
+				if ($r <= 0) return 0;	
+			}
+			
+			return 0;
+		}
+	}
+	
+	return 1;
+}

@@ -1,7 +1,20 @@
-Module104045Name = quickPriceUpdate
-Module104045Desc = quickPriceUpdate Descripion
+Module104045Name = Mise à jour rapide des prix
+Module104045Desc = Permet de mettre à jour rapidement les prix produit
 
 ATMAbout = Ce module a été développé par <a href="http://www.atm-consulting.fr" target="_blank">ATM Consulting</a><br>Vous pouvez retrouver la documentation sur notre <a href="http://wiki.atm-consulting.fr/index.php/Accueil" target="_blank">wiki</a><br><br>Pour toute question technique ou retour, contactez-nous sur <a href="mailto:support@atm-consulting.fr">support@atm-consulting.fr</a><br><br>Pour toute question commerciale, contactez-nous sur <a href="mailto:contact@atm-consulting.fr">contact@atm-consulting.fr</a> ou au +33 9 77 19 50 70<br><br>Retrouvez nos autres modules sur <a href="http://www.dolistore.com/search.php?orderby=position&orderway=desc&search_query=atm&submit_search=Rechercher" target="_blank">Dolistore</a>
 
 quickPriceUpdateSetup = Configuration du module quickPriceUpdate
 quickPriceUpdateAbout = A propos du module quickPriceUpdate
+
+quickpriceupdate_allowservice=Autoriser la modification des prix concernant les services
+quickpriceupdate_category=Categorie :
+quickpriceupdate_date=MAJ des prix non maj depuis cette date :
+quickpriceupdate_selectCategory=Séléctionnez une catégorie
+quickpriceupdate_selectAll=Tous
+quickpriceupdate_percentage=Modifier le prix de x%s
+
+quickpriceupdate_category_required=Categorie
+quickpriceupdate_date_required=Date
+quickpriceupdate_sql_error=Erreur SQL : %s
+
+quickpriceupdate_nb_priceupdate=Nombre de prix mis à jour : %s

@@ -23,6 +23,7 @@
  * 				Put some comments here
  */
 // Dolibarr environment
+
 $res = @include("../../main.inc.php"); // From htdocs directory
 if (! $res) {
     $res = @include("../../../main.inc.php"); // From "custom" directory
@@ -74,6 +75,11 @@ if (preg_match('/del_(.*)/',$action,$reg))
 	}
 }
 
+if ($action == 'priceupdate')
+{
+	_priceUpdateDolibarr($db, $conf, $langs);
+}
+
 /*
  * View
  */
@@ -97,6 +103,7 @@ dol_fiche_head(
 
 // Setup page goes here
 $form=new Form($db);
+
 $var=false;
 print '<table class="noborder" width="100%">';
 print '<tr class="liste_titre">';
@@ -108,18 +115,44 @@ print '<td align="center" width="100">'.$langs->trans("Value").'</td>'."\n";
 // Example with a yes / no select
 $var=!$var;
 print '<tr '.$bc[$var].'>';
-print '<td>'.$langs->trans("ParamLabel").'</td>';
+print '<td>'.$langs->transnoentitiesnoconv("quickpriceupdate_allowservice").'</td>';
 print '<td align="center" width="20">&nbsp;</td>';
 print '<td align="right" width="300">';
 print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
 print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
-print '<input type="hidden" name="action" value="set_CONSTNAME">';
-print $form->selectyesno("CONSTNAME",$conf->global->CONSTNAME,1);
+print '<input type="hidden" name="action" value="set_QUICKPRICEUPDATE_ALLOW_SERVICE">';
+print $form->selectyesno("QUICKPRICEUPDATE_ALLOW_SERVICE",$conf->global->QUICKPRICEUPDATE_ALLOW_SERVICE,1);
 print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
 print '</form>';
 print '</td></tr>';
 
 print '</table>';
+
+print '<br /><hr /><br />';
+print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+print '<input type="hidden" name="action" value="priceupdate" />';
+print '<table class="border" width="100%">';
+
+print '<tr>';
+print '<td width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdate_category").'</td>';
+print '<td>'.select_all_categories($form).'</td>';
+print '</tr>';
+
+print '<tr>';
+print '<td width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdate_date").'</td>';
+print '<td>'.$form->select_date('', 'tms',1, 1, 1, "", 1, 0, 1).'</td>';
+print '</tr>';
+
+print '<tr>';
+print '<td width="25%">'.$langs->transnoentities('quickpriceupdate_percentage', '%').'</td>';
+print '<td><input type="text" name="percentage" value="" size="5" />&nbsp;%</td>';
+print '</tr>';
+
+print '</table>';
+
+print '<div class="tabsAction"><input type="submit" value="Modifier les prix" class="button"></div>';
+
+print '</form>';
 
 llxFooter();
 
