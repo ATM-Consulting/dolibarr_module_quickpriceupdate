@@ -8,7 +8,7 @@ quickPriceUpdateAbout = A propos du module quickPriceUpdate
 
 quickpriceupdate_allowservice=Autoriser la modification des prix concernant les services
 quickpriceupdate_category=Categorie :
-quickpriceupdate_date=MAJ des prix non maj depuis cette date :
+quickpriceupdate_date=Mettre à jour les prix dont la date de dernière modification du prix est antérieur à cette date :
 quickpriceupdate_selectCategory=Séléctionnez une catégorie
 quickpriceupdate_selectAll=Tous
 quickpriceupdate_percentage=Modifier le prix de x%s

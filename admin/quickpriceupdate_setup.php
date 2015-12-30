@@ -134,17 +134,17 @@ print '<input type="hidden" name="action" value="priceupdate" />';
 print '<table class="border" width="100%">';
 
 print '<tr>';
-print '<td width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdate_category").'</td>';
+print '<td class="fieldrequired" width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdate_category").'</td>';
 print '<td>'.select_all_categories($form).'</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdate_date").'</td>';
+print '<td class="fieldrequired" width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdate_date").'</td>';
 print '<td>'.$form->select_date('', 'tms',1, 1, 1, "", 1, 0, 1).'</td>';
 print '</tr>';
 
 print '<tr>';
-print '<td width="25%">'.$langs->transnoentities('quickpriceupdate_percentage', '%').'</td>';
+print '<td class="fieldrequired" width="25%">'.$langs->transnoentities('quickpriceupdate_percentage', '%').'</td>';
 print '<td><input type="text" name="percentage" value="" size="5" />&nbsp;%</td>';
 print '</tr>';
 

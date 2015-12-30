@@ -96,9 +96,9 @@ function _priceUpdateDolibarrAction(&$db, &$conf, &$langs, $fk_category, $tms, $
 {
 	global $user;
 	
-	$sql = 'SELECT  pp.fk_product FROM '.MAIN_DB_PREFIX.'product_price pp';
+	$sql = 'SELECT pp.rowid, pp.fk_product, pp.price_level FROM '.MAIN_DB_PREFIX.'product_price pp';
 	if ($fk_category > 0) $sql .= ' INNER JOIN '.MAIN_DB_PREFIX.'categorie_product cp ON (cp.fk_product = pp.fk_product AND cp.fk_categorie = '.$fk_category.')';
-	$sql .= ' WHERE pp.tms >= ALL (SELECT pp2.tms FROM '.MAIN_DB_PREFIX.'product_price pp2 WHERE pp2.fk_product = pp.fk_product) AND pp.tms < "'.$tms.'"';
+	$sql .= ' WHERE pp.tms >= ALL (SELECT pp2.tms FROM '.MAIN_DB_PREFIX.'product_price pp2 WHERE pp2.fk_product = pp.fk_product AND pp2.price_level = pp.price_level) AND pp.tms < "'.$tms.'"';
 	
 	$resql = $db->query($sql);
 	if ($resql)
@@ -123,20 +123,24 @@ function _priceUpdateDolibarrAction(&$db, &$conf, &$langs, $fk_category, $tms, $
 function _updatePrice(&$db, &$conf, &$row, &$user, $percentage)
 {
 	$coef = 1 + ($percentage / 100);
-	if (!empty($conf->global->PRODUCT_PRICE_UNIQ))
+	
+	$product = new Product($db);
+	if ($product->fetch($row->fk_product) > 0)
 	{
-		$product = new Product($db);
-		if ($product->fetch($row->fk_product) > 0)
+		if ($product->type == 0 || !empty($conf->global->QUICKPRICEUPDATE_ALLOW_SERVICE))
 		{
-			if ($product->type == 0 || !empty($conf->global->QUICKPRICEUPDATE_ALLOW_SERVICE))
-			{
-				$r = $product->updatePrice($product->price * $coef, 'HT', $user);
-				if ($r <= 0) return 0;	
-			}
+			if (!empty($conf->global->PRODUCT_PRICE_UNIQ)) return _updatePriceByLevel($user, $product, $product->price, $product->price_min, $coef, $row->price_level);
+			elseif (!empty($conf->global->PRODUIT_MULTIPRICES)) return _updatePriceByLevel($user, $product, $product->multiprices[$row->price_level], $product->multiprices_min[$row->price_level], $coef, $row->price_level);
 			
-			return 0;
 		}
 	}
 	
-	return 1;
+	return 0;
+}
+
+function _updatePriceByLevel(&$user, &$product, $price, $price_min, $coef, $level)
+{
+	$r = $product->updatePrice($price * $coef, 'HT', $user, '', $price_min * $coef, $level);
+	if ($r <= 0) return 0;
+	else return 1;
 }
