@@ -18,3 +18,5 @@ quickpriceupdate_date_required=Date
 quickpriceupdate_sql_error=Erreur SQL : %s
 
 quickpriceupdate_nb_priceupdate=Nombre de prix mis à jour : %s
+
+quickpriceupdateRefFilter=Filtre référence

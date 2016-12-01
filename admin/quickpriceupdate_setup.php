@@ -130,27 +130,47 @@ print '</table>';
 
 print '<br /><hr /><br />';
 print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-print '<input type="hidden" name="action" value="priceupdate" />';
+print '<input type="hidden" name="action" value="'.($action=='show_modif' ? 'priceupdate'  :'show_modif').'" />';
 print '<table class="border" width="100%">';
 
 print '<tr>';
-print '<td class="fieldrequired" width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdate_category").'</td>';
+print '<td width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdate_category").'</td>';
 print '<td>'.select_all_categories($form).'</td>';
 print '</tr>';
 
 print '<tr>';
+print '<td  width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdateRefFilter").'</td>';
+print '<td><input type="text" value="'.GETPOST('reffilter').'" name="reffilter" /></td>';
+print '</tr>';
+
+
+print '<tr>';
 print '<td class="fieldrequired" width="25%">'.$langs->transnoentitiesnoconv("quickpriceupdate_date").'</td>';
-print '<td>'.$form->select_date('', 'tms',1, 1, 1, "", 1, 0, 1).'</td>';
+print '<td>'.$form->select_date(GETPOST('tms'), 'tms',1, 1, 1, "", 1, 0, 1).'</td>';
 print '</tr>';
 
 print '<tr>';
 print '<td class="fieldrequired" width="25%">'.$langs->transnoentities('quickpriceupdate_percentage', '%').'</td>';
-print '<td><input type="text" name="percentage" value="" size="5" />&nbsp;%</td>';
+print '<td><input type="text" name="percentage" value="'.GETPOST('percentage').'" size="5" />&nbsp;%</td>';
 print '</tr>';
 
 print '</table>';
 
-print '<div class="tabsAction"><input type="submit" value="Modifier les prix" class="button"></div>';
+print '<div class="tabsAction">';
+
+
+if($action == 'show_modif') {
+				
+	_priceUpdateDolibarrProduct(GETPOST('tms'), GETPOST('fk_category'),GETPOST('reffilter'));
+		
+	
+	print '<input type="submit" value="Modifier les prix" class="button">';	
+}
+else {
+	print '<input type="submit" value="Voir les produit impactés" class="button">';
+}
+
+print '</div>';
 
 print '</form>';
 

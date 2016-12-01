@@ -58,7 +58,7 @@ function select_all_categories(&$form)
 {
 	global $langs;
 	$Tab = array(-1 => $langs->transnoentitiesnoconv('quickpriceupdate_selectCategory'), 0 => $langs->transnoentitiesnoconv('quickpriceupdate_selectAll'));
-	$Tab += $form->select_all_categories(0,'', 'fk_category', 64, 0, 1);
+	$Tab += $form->select_all_categories(0,GETPOST('fk_category'), 'fk_category', 64, 0, 1);
 	
 	return $form->selectarray('fk_category', $Tab);
 }
@@ -92,7 +92,33 @@ function _priceUpdateDolibarr(&$db, &$conf, &$langs)
 	}
 }
 
-function _priceUpdateDolibarrAction(&$db, &$conf, &$langs, $fk_category, $tms, $percentage)
+function _priceUpdateDolibarrProduct($tms, $fk_category=0, $reffilter='') {
+	global $db, $conf, $user;
+	$sql = 'SELECT pp.rowid, pp.fk_product, pp.price_level FROM '.MAIN_DB_PREFIX.'product_price pp';
+	if ($fk_category > 0) $sql .= ' INNER JOIN '.MAIN_DB_PREFIX.'categorie_product cp ON (cp.fk_product = pp.fk_product AND cp.fk_categorie = '.$fk_category.')';
+	
+	
+	$sql .= ' WHERE pp.tms >= ALL (SELECT pp2.tms FROM '.MAIN_DB_PREFIX.'product_price pp2 WHERE pp2.fk_product = pp.fk_product AND pp2.price_level = pp.price_level) AND pp.tms < "'.$tms.'"';
+	
+	$resql = $db->query($sql);
+	
+	$TProduct=array();
+	
+	if ($resql)
+	{
+		$i=0;
+		while ($row = $db->fetch_object($resql)) {
+			
+			$TProduct[] = $row;
+			
+		}
+	
+	}
+	
+	return $TProduct;
+}
+
+function _priceUpdateDolibarrAction(&$db, &$conf, &$langs, $fk_category,$reffilter, $tms, $percentage)
 {
 	global $user;
 	
@@ -101,20 +127,16 @@ function _priceUpdateDolibarrAction(&$db, &$conf, &$langs, $fk_category, $tms, $
 	$sql .= ' WHERE pp.tms >= ALL (SELECT pp2.tms FROM '.MAIN_DB_PREFIX.'product_price pp2 WHERE pp2.fk_product = pp.fk_product AND pp2.price_level = pp.price_level) AND pp.tms < "'.$tms.'"';
 	
 	$resql = $db->query($sql);
-	if ($resql)
-	{
-		$i=0;
-		while ($row = $db->fetch_object($resql))
-		{
+	
+	$TProduct = _priceUpdateDolibarrProduct($tms, $fk_category, $reffilter);
+	$i = 0;
+	foreach($TProduct as $row) {
 			$i += _updatePrice($db, $conf, $row, $user, $percentage);
-		}
+	}
 		
-		setEventMessages($langs->trans('quickpriceupdate_nb_priceupdate', $i), null);
-	}
-	else 
-	{
-		setEventMessages($langs->trans('quickpriceupdate_sql_error', $sql, $db->lasterror), null, 'errors');
-	}
+	setEventMessages($langs->trans('quickpriceupdate_nb_priceupdate', $i), null);
+	
+	
 }
 
 /**
