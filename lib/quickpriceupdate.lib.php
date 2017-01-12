@@ -219,13 +219,12 @@ function _updateTarif(&$db, &$conf, &$langs)
 		$res = _insertTarif($db, $data, $max_rowid);
 		if ($res >= 0)
 		{
-			$max_rowid++;
 			$nb_insert += $res;
 		}
 		else
 		{
 			$error++;
-			setEventMessage($langs->trans('quickpriceupdate_tarif_error', $db->lastquerryerror), 'errors');
+			setEventMessage($langs->trans('quickpriceupdate_tarif_error', $db->lastqueryerror), 'errors');
 			break;
 		}
 	}
@@ -244,7 +243,7 @@ function _updateDateTarif(&$db, $product_ref, $date_ymdhis, $fk_country)
 	else return 0;
 }
 
-function _insertTarif(&$db, &$data, $max_rowid)
+function _insertTarif(&$db, &$data, &$max_rowid)
 {
 	$nb_insert = 0;
 	
@@ -254,7 +253,11 @@ function _insertTarif(&$db, &$data, $max_rowid)
 		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p1'].', '.$data['remise_p1'].', '.$data['price_ht'].');';
 
 		$resql = $db->query($sql);
-		if ($resql) $nb_insert++;
+		if ($resql) 
+		{
+			$nb_insert++;
+			$max_rowid++;
+		}
 		else return -1;
 	}
 
@@ -264,7 +267,11 @@ function _insertTarif(&$db, &$data, $max_rowid)
 		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p2'].', '.$data['remise_p2'].', '.$data['price_ht'].');';
 
 		$resql = $db->query($sql);
-		if ($resql) $nb_insert++;
+		if ($resql)
+		{
+			$nb_insert++;
+			$max_rowid++;
+		}
 		else return -2;
 	}
 
@@ -274,7 +281,11 @@ function _insertTarif(&$db, &$data, $max_rowid)
 		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p3'].', '.$data['remise_p3'].', '.$data['price_ht'].');';
 		
 		$resql = $db->query($sql);
-		if ($resql) $nb_insert++;
+		if ($resql)
+		{
+			$nb_insert++;
+			$max_rowid++;
+		}
 		else return -3;
 	}
 
@@ -284,7 +295,11 @@ function _insertTarif(&$db, &$data, $max_rowid)
 		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p4'].', '.$data['remise_p4'].', '.$data['price_ht'].');';
 		
 		$resql = $db->query($sql);
-		if ($resql) $nb_insert++;
+		if ($resql)
+		{
+			$nb_insert++;
+			$max_rowid++;
+		}
 		else return -4;
 	}
 	
