@@ -144,3 +144,126 @@ function _updatePriceByLevel(&$user, &$product, $price, $price_min, $coef, $leve
 	if ($r <= 0) return 0;
 	else return 1;
 }
+
+
+function _updateTarif(&$db, &$conf, &$langs)
+{
+	dol_include_once('/core/lib/functions.lib.php');
+	$file = $_FILES['tarif'];
+	if (!empty($file['error']))
+	{
+		// error
+		return;
+	}
+	
+	$handler = fopen($file['tmp_name'], 'r');
+	
+	$line = fgets($handler, '4096'); // skip first line
+	
+	$TData = array();
+	while ($line = fgets($handler, '4096'))
+	{
+		$tab = str_getcsv($line, ';');
+		$TData[] = array(
+			'product_ref' => $tab[0]
+			,'date_fin_prev_tarif' => $tab[1]
+			,'tarif_type' => $tab[2]
+			,'fk_country' => (int) $tab[3]
+			,'fk_soc' => (int) $tab[4]
+			,'fk_categorie' => (int) $tab[5]
+			,'date_deb' => $tab[6]
+			,'date_fin' => $tab[7]
+			,'tva' => (double) $tab[8]
+			,'price_ht' => (double) price2num($tab[9])
+			,'qty_p1' => (double) $tab[10]
+			,'remise_p1' => (double) $tab[11]
+			,'qty_p2' => (double) $tab[12]
+			,'remise_p2' => (double) $tab[13]
+			,'qty_p3' => (double) $tab[14]
+			,'remise_p3' => (double) $tab[15]
+			,'qty_p4' => (double) $tab[16]
+			,'remise_p4' => (double) $tab[17]
+			
+		);
+	}
+	
+	$currency_code = 'EUR';
+	$now = date('Y-m-d H:i:s');
+	$nb_update_date_prev_tarif = $nb_insert = $error = 0;
+	
+	$db->begin();
+	
+	foreach ($TData as &$data)
+	{
+		if (!empty($data['date_fin_prev_tarif']))
+		{
+			$res = _updateDateTarif($db, $data['product_ref'], $data['date_fin_prev_tarif'], $data['fk_country']);
+			$nb_update_date_prev_tarif += $res;
+		}
+		
+		$res = _insertTarif($db, $data);
+		if ($res >= 0) $nb_insert += $res;
+		else
+		{
+			$error++;
+			setEventMessage($langs->trans('quickpriceupdate_tarif_error', $db->lastquerryerror));
+		}
+	}
+
+	if ($error)	$db->rollback();
+	else $db->commit();
+	
+}
+
+function _updateDateTarif(&$db, $product_ref, $date_ymdhis, $fk_country)
+{
+	$sql = 'UPDATE '.MAIN_DB_PREFIX.'tarif_conditionnement SET date_fin = \''.$date_ymdhis.'\' WHERE fk_country = '.((int) $fk_country).' AND fk_product = (SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$db->escape($product_ref).'");';
+	$resql = $db->query($sql);
+	
+	if ($resql) return 1;
+	else return 0;
+}
+
+function _insertTarif(&$db, &$data)
+{
+	$nb_insert = 0;
+	
+	if (!empty($data['qty_p1']))
+	{
+		$sql = 'INSERT INTO llx_tarif_conditionnement (date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
+		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p1'].', '.$data['remise_p1'].', '.$data['price_ht'].');';
+
+		$resql = $db->query($sql);
+		if ($resql) $nb_insert++;
+		else return -1;
+	}
+
+	if (!empty($data['qty_p2']))
+	{
+		$sql = 'INSERT INTO llx_tarif_conditionnement (date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
+		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p2'].', '.$data['remise_p2'].', '.$data['price_ht'].');';
+
+		if ($resql) $nb_insert++;
+		else return -2
+	}
+
+	if (!empty($data['qty_p3']))
+	{
+		$sql = 'INSERT INTO llx_tarif_conditionnement (date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
+		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p3'].', '.$data['remise_p3'].', '.$data['price_ht'].');';
+		
+		if ($resql) $nb_insert++;
+		else return -3
+	}
+
+	if (!empty($data['qty_p4']))
+	{
+		$sql = 'INSERT INTO llx_tarif_conditionnement (date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
+		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p4'].', '.$data['remise_p4'].', '.$data['price_ht'].');';
+		
+		if ($resql) $nb_insert++;
+		else return -4
+	}
+	
+	return $nb_insert;
+}
