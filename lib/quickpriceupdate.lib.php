@@ -224,14 +224,20 @@ function _updateTarif(&$db, &$conf, &$langs)
 		else
 		{
 			$error++;
-			setEventMessage($langs->trans('quickpriceupdate_tarif_error', $db->lastqueryerror), 'errors');
 			break;
 		}
 	}
 
-	if ($error)	$db->rollback();
-	else $db->commit();
-	
+	if ($error)
+	{
+		$db->rollback();
+		setEventMessage($langs->trans('quickpriceupdate_tarif_error', $db->lastqueryerror), 'errors');
+	}
+	else
+	{
+		$db->commit();
+		setEventMessage($langs->trans('quickpriceupdate_tarif_success'), count($TData), $nb_update_date_prev_tarif, $nb_insert);
+	}
 }
 
 function _updateDateTarif(&$db, $product_ref, $date_ymdhis, $fk_country)
