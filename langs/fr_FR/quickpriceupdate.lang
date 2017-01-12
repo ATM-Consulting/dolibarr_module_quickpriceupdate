@@ -20,6 +20,6 @@ quickpriceupdate_sql_error=Erreur SQL : %s
 quickpriceupdate_nb_priceupdate=Nombre de prix mis à jour : %s
 
 quickpriceupdate_tarif=Mise à jour des tarifs
-quickpriceupdate_tarif_help=Format csv : ref produit; date anciens tarif si vide (Y-m-d H:i:s); type de prix (PERCENT, PRICE, PERCENT/PRICE); fk_country; fk_soc; fk_categorie; date deb nouveau tarif (Y-m-d H:i:s); date fin nouveau tarif (Y-m-d H:i:s); TVA; prix HT de base; quantité palier 1; remise palier 1
+quickpriceupdate_tarif_help=Format csv : ref produit; date anciens tarif si vide (Y-m-d H:i:s); type de prix (PERCENT, PRICE, PERCENT/PRICE); fk_country; fk_soc; fk_categorie; date deb nouveau tarif (Y-m-d H:i:s); date fin nouveau tarif (Y-m-d H:i:s); TVA; prix HT de base; quantité palier 1; remise palier 1; quantité palier 2; remise palier 2; quantité palier 3; remise palier 3; quantité palier 4; remise palier 4
 quickpriceupdate_tarif_error=Erreur sur insertion [rollback] lastqueryerror = %s
 quickpriceupdate_tarif_success=Mise à jour de %d produits dont %d dates de fin appliquée tarifs et %d insertions
