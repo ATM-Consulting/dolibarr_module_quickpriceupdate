@@ -79,6 +79,10 @@ if ($action == 'priceupdate')
 {
 	_priceUpdateDolibarr($db, $conf, $langs);
 }
+elseif ($action == 'tarifupdate')
+{
+	_updateTarif($db, $conf, $langs);
+}
 
 /*
  * View
@@ -153,6 +157,27 @@ print '</table>';
 print '<div class="tabsAction"><input type="submit" value="Modifier les prix" class="button"></div>';
 
 print '</form>';
+
+
+if (!empty($conf->tarif->enabled) && false) // TODO ajout suite à import des tarifs bourguignon [code à checker avant de le mettre en dispo pour tous]
+{
+	print '<hr /><br />';
+	print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'" enctype="multipart/form-data">';
+
+	print '<input type="hidden" name="action" value="tarifupdate" />';
+	print '<table class="border" width="100%">';
+
+	print '<tr>';
+	print '<td class="fieldrequired" width="25%">'.$form->textwithpicto($langs->transnoentitiesnoconv("quickpriceupdate_tarif"), $langs->transnoentitiesnoconv("quickpriceupdate_tarif_help")).'</td>';
+	print '<td><input type="file" name="tarif" value="" /></td>';
+	print '</tr>';
+	
+	print '</table>';
+
+	print '<div class="tabsAction"><input type="submit" value="Modifier les tarifs" class="button"></div>';
+	print '</form>';	
+}
+
 
 llxFooter();
 
