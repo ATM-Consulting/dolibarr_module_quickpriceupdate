@@ -238,6 +238,9 @@ function _updateTarif(&$db, &$conf, &$langs)
 		$db->commit();
 		setEventMessage($langs->trans('quickpriceupdate_tarif_success', count($TData), $nb_update_date_prev_tarif, $nb_insert));
 	}
+	
+	header('Location: '. dol_buildpath('/quickpriceupdate/admin/quickpriceupdate_setup.php', 1));
+	exit;
 }
 
 function _updateDateTarif(&$db, $product_ref, $date_ymdhis, $fk_country)
