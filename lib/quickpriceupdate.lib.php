@@ -57,6 +57,9 @@ function quickpriceupdateAdminPrepareHead()
 function select_all_categories(&$form)
 {
 	global $langs;
+	
+	if (!class_exists('Categorie')) dol_include_once ('/categories/class/categorie.class.php');
+	
 	$Tab = array(-1 => $langs->transnoentitiesnoconv('quickpriceupdate_selectCategory'), 0 => $langs->transnoentitiesnoconv('quickpriceupdate_selectAll'));
 	$Tab += $form->select_all_categories(0,'', 'fk_category', 64, 0, 1);
 	
@@ -206,7 +209,8 @@ function _updateTarif(&$db, &$conf, &$langs)
 		else
 		{
 			$error++;
-			setEventMessage($langs->trans('quickpriceupdate_tarif_error', $db->lastquerryerror));
+			setEventMessage($langs->trans('quickpriceupdate_tarif_error', $db->lastquerryerror), 'errors');
+			break;
 		}
 	}
 
@@ -235,7 +239,11 @@ function _insertTarif(&$db, &$data)
 
 		$resql = $db->query($sql);
 		if ($resql) $nb_insert++;
-		else return -1;
+		else 
+		{
+			setEventMessage($sql, 'errors');
+			return -1;
+		}
 	}
 
 	if (!empty($data['qty_p2']))
@@ -244,7 +252,11 @@ function _insertTarif(&$db, &$data)
 		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p2'].', '.$data['remise_p2'].', '.$data['price_ht'].');';
 
 		if ($resql) $nb_insert++;
-		else return -2;
+		else 
+		{
+			setEventMessage($sql, 'errors');
+			return -2;
+		}
 	}
 
 	if (!empty($data['qty_p3']))
@@ -253,7 +265,11 @@ function _insertTarif(&$db, &$data)
 		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p3'].', '.$data['remise_p3'].', '.$data['price_ht'].');';
 		
 		if ($resql) $nb_insert++;
-		else return -3;
+		else 
+		{
+			setEventMessage($sql, 'errors');
+			return -3;
+		}
 	}
 
 	if (!empty($data['qty_p4']))
@@ -262,7 +278,11 @@ function _insertTarif(&$db, &$data)
 		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p4'].', '.$data['remise_p4'].', '.$data['price_ht'].');';
 		
 		if ($resql) $nb_insert++;
-		else return -4;
+		else 
+		{
+			setEventMessage($sql, 'errors');
+			return -4;
+		}
 	}
 	
 	return $nb_insert;
