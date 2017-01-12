@@ -197,7 +197,7 @@ function _updateTarif(&$db, &$conf, &$langs)
 	$nb_update_date_prev_tarif = $nb_insert = $error = 0;
 	
 	
-	$sql = 'SELECT MAX(rowid) FROM '.MAIN_DB_PREFIX.'tarif_conditionnement';
+	$sql = 'SELECT MAX(rowid) as rowid FROM '.MAIN_DB_PREFIX.'tarif_conditionnement';
 	$resql = $db->query($sql);
 	if ($resql)
 	{
@@ -263,15 +263,17 @@ function _insertTarif(&$db, &$data, $max_rowid)
 		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'tarif_conditionnement (rowid, date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
 		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p2'].', '.$data['remise_p2'].', '.$data['price_ht'].');';
 
+		$resql = $db->query($sql);
 		if ($resql) $nb_insert++;
 		else return -2;
 	}
 
 	if (!empty($data['qty_p3']))
 	{
-		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'tarif_conditionnement (rowid date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'tarif_conditionnement (rowid, date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
 		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p3'].', '.$data['remise_p3'].', '.$data['price_ht'].');';
 		
+		$resql = $db->query($sql);
 		if ($resql) $nb_insert++;
 		else return -3;
 	}
@@ -281,6 +283,7 @@ function _insertTarif(&$db, &$data, $max_rowid)
 		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'tarif_conditionnement (rowid, date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
 		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p4'].', '.$data['remise_p4'].', '.$data['price_ht'].');';
 		
+		$resql = $db->query($sql);
 		if ($resql) $nb_insert++;
 		else return -4;
 	}
