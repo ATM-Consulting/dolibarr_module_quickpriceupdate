@@ -152,6 +152,8 @@ function _updatePriceByLevel(&$user, &$product, $price, $price_min, $coef, $leve
 function _updateTarif(&$db, &$conf, &$langs)
 {
 	dol_include_once('/core/lib/functions.lib.php');
+	$langs->load('quickpriceupdate@quickpriceupdate');
+	
 	$file = $_FILES['tarif'];
 	if (!empty($file['error']))
 	{
@@ -194,6 +196,16 @@ function _updateTarif(&$db, &$conf, &$langs)
 	$now = date('Y-m-d H:i:s');
 	$nb_update_date_prev_tarif = $nb_insert = $error = 0;
 	
+	
+	$sql = 'SELECT MAX(rowid) FROM '.MAIN_DB_PREFIX.'tarif_conditionnement';
+	$resql = $db->query($sql);
+	if ($resql)
+	{
+		$d = $db->fetch_object($resql);
+		$max_rowid = $d->rowid +1;
+	}
+	
+	
 	$db->begin();
 	
 	foreach ($TData as &$data)
@@ -204,8 +216,12 @@ function _updateTarif(&$db, &$conf, &$langs)
 			$nb_update_date_prev_tarif += $res;
 		}
 		
-		$res = _insertTarif($db, $data);
-		if ($res >= 0) $nb_insert += $res;
+		$res = _insertTarif($db, $data, $max_rowid);
+		if ($res >= 0)
+		{
+			$max_rowid++;
+			$nb_insert += $res;
+		}
 		else
 		{
 			$error++;
@@ -228,61 +244,45 @@ function _updateDateTarif(&$db, $product_ref, $date_ymdhis, $fk_country)
 	else return 0;
 }
 
-function _insertTarif(&$db, &$data)
+function _insertTarif(&$db, &$data, $max_rowid)
 {
 	$nb_insert = 0;
 	
 	if (!empty($data['qty_p1']))
 	{
-		$sql = 'INSERT INTO llx_tarif_conditionnement (date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
-		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p1'].', '.$data['remise_p1'].', '.$data['price_ht'].');';
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'tarif_conditionnement (rowid, date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
+		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p1'].', '.$data['remise_p1'].', '.$data['price_ht'].');';
 
 		$resql = $db->query($sql);
 		if ($resql) $nb_insert++;
-		else 
-		{
-			setEventMessage($sql, 'errors');
-			return -1;
-		}
+		else return -1;
 	}
 
 	if (!empty($data['qty_p2']))
 	{
-		$sql = 'INSERT INTO llx_tarif_conditionnement (date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
-		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p2'].', '.$data['remise_p2'].', '.$data['price_ht'].');';
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'tarif_conditionnement (rowid, date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
+		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p2'].', '.$data['remise_p2'].', '.$data['price_ht'].');';
 
 		if ($resql) $nb_insert++;
-		else 
-		{
-			setEventMessage($sql, 'errors');
-			return -2;
-		}
+		else return -2;
 	}
 
 	if (!empty($data['qty_p3']))
 	{
-		$sql = 'INSERT INTO llx_tarif_conditionnement (date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
-		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p3'].', '.$data['remise_p3'].', '.$data['price_ht'].');';
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'tarif_conditionnement (rowid date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
+		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p3'].', '.$data['remise_p3'].', '.$data['price_ht'].');';
 		
 		if ($resql) $nb_insert++;
-		else 
-		{
-			setEventMessage($sql, 'errors');
-			return -3;
-		}
+		else return -3;
 	}
 
 	if (!empty($data['qty_p4']))
 	{
-		$sql = 'INSERT INTO llx_tarif_conditionnement (date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
-		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p4'].', '.$data['remise_p4'].', '.$data['price_ht'].');';
+		$sql = 'INSERT INTO '.MAIN_DB_PREFIX.'tarif_conditionnement (rowid, date_cre, date_maj, unite, unite_value, price_base_type, type_price, currency_code,tva_tx, fk_user_author,fk_country, fk_categorie_client, fk_soc, fk_project, date_debut, date_fin,fk_product,quantite,remise_percent,prix) '
+		. 'VALUES ('.$max_rowid.', \''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM '.MAIN_DB_PREFIX.'product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p4'].', '.$data['remise_p4'].', '.$data['price_ht'].');';
 		
 		if ($resql) $nb_insert++;
-		else 
-		{
-			setEventMessage($sql, 'errors');
-			return -4;
-		}
+		else return -4;
 	}
 	
 	return $nb_insert;
