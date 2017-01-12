@@ -244,7 +244,7 @@ function _insertTarif(&$db, &$data)
 		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p2'].', '.$data['remise_p2'].', '.$data['price_ht'].');';
 
 		if ($resql) $nb_insert++;
-		else return -2
+		else return -2;
 	}
 
 	if (!empty($data['qty_p3']))
@@ -253,7 +253,7 @@ function _insertTarif(&$db, &$data)
 		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p3'].', '.$data['remise_p3'].', '.$data['price_ht'].');';
 		
 		if ($resql) $nb_insert++;
-		else return -3
+		else return -3;
 	}
 
 	if (!empty($data['qty_p4']))
@@ -262,7 +262,7 @@ function _insertTarif(&$db, &$data)
 		. 'VALUES (\''.$now.'\',\''.$now.'\',"U",0,"HT","'.$data['tarif_type'].'","'.$currency_code.'", '.$data['tva'].',1,'.$data['fk_country'].','.$data['fk_categorie'].','.$data['fk_soc'].',0,\''.$data['date_deb'].'\',\''.$data['date_fin'].'\',(SELECT rowid FROM llx_product WHERE ref = "'.$data['product_ref'].'"), '.$data['qty_p4'].', '.$data['remise_p4'].', '.$data['price_ht'].');';
 		
 		if ($resql) $nb_insert++;
-		else return -4
+		else return -4;
 	}
 	
 	return $nb_insert;
