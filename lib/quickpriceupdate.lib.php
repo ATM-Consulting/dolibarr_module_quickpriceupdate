@@ -236,7 +236,7 @@ function _updateTarif(&$db, &$conf, &$langs)
 	else
 	{
 		$db->commit();
-		setEventMessage($langs->trans('quickpriceupdate_tarif_success'), count($TData), $nb_update_date_prev_tarif, $nb_insert);
+		setEventMessage($langs->trans('quickpriceupdate_tarif_success', count($TData), $nb_update_date_prev_tarif, $nb_insert));
 	}
 }
 
