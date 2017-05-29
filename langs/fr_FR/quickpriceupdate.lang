@@ -23,3 +23,16 @@ quickpriceupdate_tarif=Mise à jour des tarifs
 quickpriceupdate_tarif_help=Format csv : ref produit; date anciens tarif si vide (Y-m-d H:i:s); type de prix (PERCENT, PRICE, PERCENT/PRICE); fk_country; fk_soc; fk_categorie; date deb nouveau tarif (Y-m-d H:i:s); date fin nouveau tarif (Y-m-d H:i:s); TVA; prix HT de base; quantité palier 1; remise palier 1; quantité palier 2; remise palier 2; quantité palier 3; remise palier 3; quantité palier 4; remise palier 4
 quickpriceupdate_tarif_error=Erreur sur insertion [rollback] lastqueryerror = %s
 quickpriceupdate_tarif_success=Mise à jour de %d produits dont %d dates de fin appliquée tarifs et %d insertions
+
+
+quickpriceupdate_supplier=Fournisseur
+quickpriceupdate_supplierprice_file=Fichier des nouveaux prix
+quickpriceupdate_supplierprice_file_help=<u>Format du fichier :</u><br />id produit;réf. produit;<b>NU</b>;<b>NU</b>;réf. produit fournisseur;prix unitaire ht (actuel);prix unitaire ht (nouveau)<br /><br /><b>NU = Non utilisé</b><br />Caractère de séparation "<b>;</b>"<br />Le fichier doit être encodé en UTF-8<br />Si la colonne "id produit" n'esrt pas renseigné alors la référence sera utilisé pour retrouver le produit
+quickpriceupdate_simulate_update_supplierprice=Simuler
+quickpriceupdate_update_supplierprice=Mettre à jour
+
+quickpriceupdate_error_no_supplier_selected=Erreur : le choix d'un fournisseur est obligatoire
+quickpriceupdate_error_file=Erreur : pas de fichier ou fichier erroné
+quickpriceupdate_supplierprice_file_with_header=Fichier avec une entête à ignorer ?
+
+quickpriceupdate_errors_found=Des erreurs ont été détectées, aucun prix mis à jour
