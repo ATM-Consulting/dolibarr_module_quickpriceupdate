@@ -214,8 +214,8 @@ else print '<div class="tabsAction"><input type="submit" value="'.$langs->trans(
 
 print '</form>';
 
-if (!empty($TSupplierRes['errors'])) foreach ($TSupplierRes as $err) print '<div class="error">'.$err.'</div>';
-if (!empty($TSupplierRes['warnings'])) foreach ($TSupplierRes as $war) print '<div class="warning">'.$war.'</div>';
+if (!empty($TSupplierRes['errors'])) foreach ($TSupplierRes['errors'] as $err) print '<div class="error">'.$err.'</div>';
+if (!empty($TSupplierRes['warnings'])) foreach ($TSupplierRes['warnings'] as $war) print '<div class="warning">'.$war.'</div>';
 
 llxFooter();
 
