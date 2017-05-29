@@ -189,7 +189,7 @@ print '<hr /><br />';
 
 print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'" enctype="multipart/form-data">';
 
-if (GETPOST('simulateupdatesupplierprice')) print '<input type="hidden" name="action" value="updatesupplierprice" />';
+if ($action == 'simulateupdatesupplierprice') print '<input type="hidden" name="action" value="updatesupplierprice" />';
 else print '<input type="hidden" name="action" value="simulateupdatesupplierprice" />';
 
 print '<table class="border" width="100%">';
@@ -204,12 +204,12 @@ print '<td><input type="file" name="filesupplierprice" value="" /></td>';
 print '</tr>';
 print '<tr>';
 print '<td width="25%">'.$langs->transnoentitiesnoconv('quickpriceupdate_supplierprice_file_with_header').'</td>';
-print '<td><input type="checkbox" name="filewithheader" value="1" /></td>';
+print '<td><input type="checkbox" name="filewithheader" value="1" '.(GETPOST('filewithheader') ? 'checked="checked"' : '').' /></td>';
 print '</tr>';
 
 print '</table>';
 
-if (GETPOST('simulateupdatesupplierprice')) '<div class="tabsAction"><input type="submit" value="'.$langs->trans('quickpriceupdate_update_supplierprice').'" class="button"></div>';
+if ($action == 'simulateupdatesupplierprice') print '<div class="tabsAction"><input type="submit" value="'.$langs->trans('quickpriceupdate_update_supplierprice').'" class="button"></div>';
 else print '<div class="tabsAction"><input type="submit" value="'.$langs->trans('quickpriceupdate_simulate_update_supplierprice').'" class="button"></div>';
 
 print '</form>';

@@ -36,3 +36,6 @@ quickpriceupdate_error_file=Erreur : pas de fichier ou fichier erroné
 quickpriceupdate_supplierprice_file_with_header=Fichier avec une entête à ignorer ?
 
 quickpriceupdate_errors_found=Des erreurs ont été détectées, aucun prix mis à jour
+
+quickpriceupdate_updated_price=%d prix mis à jour
+quickpriceupdate_not_found_price=%d prix non trouvé

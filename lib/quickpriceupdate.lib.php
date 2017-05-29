@@ -365,7 +365,11 @@ function _updateSupplierPrice(&$db, &$langs, $action)
 			if ($res < 0) $nb_error++;
 			elseif ($res == 0) $nb_not_found++;
 			
-			$sql = 'SELECT pfp.rowid, pfp.quantity, pfp.fk_availability, pfp.tva_tx, pfp.charges, pfp.remise_percent, pfp.remise, pfp.info_bits, pfp.delivery_time_days, pfp.supplier_reputation FROM '.MAIN_DB_PREFIX.'product_fournisseur_price pfp WHERE fk_soc = '.$supplier->id.' AND ref_fourn = \''.$line['ref_price'].'\' AND price = '.$line['old_price'];
+			$sql = 'SELECT pfp.rowid, pfp.quantity, pfp.fk_availability, pfp.tva_tx, pfp.charges, pfp.remise_percent, pfp.remise, pfp.info_bits, pfp.delivery_time_days';
+			if ((float) DOL_VERSION >= 4.0) $sql.= ', pfp.supplier_reputation';
+			else ', \'\' as supplier_reputation';
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'product_fournisseur_price pfp WHERE fk_soc = '.$supplier->id.' AND ref_fourn = \''.$line['ref_price'].'\' AND unitprice = '.$line['old_price'];
+			
 			$resql = $db->query($sql);
 			if ($resql)
 			{
@@ -374,9 +378,9 @@ function _updateSupplierPrice(&$db, &$langs, $action)
 				{
 					$r = $db->fetch_object($resql);
 					$object->product_fourn_price_id = $r->rowid;
-					$res = $object->update_buyprice($r->quantity, $line['new_price'], $user, 'HT', $supplier, $r->fk_availability, $line['ref_price'], $r->tva_tx, $r->charges, $r->remise_percent, $r->remise, $r->info_bits, $r->delivery_time_days, $r->supplier_reputation);
+					$res = $object->update_buyprice($r->quantity, $line['new_price']*$r->quantity, $user, 'HT', $supplier, $r->fk_availability, $line['ref_price'], $r->tva_tx, $r->charges, $r->remise_percent, $r->remise, $r->info_bits, $r->delivery_time_days, $r->supplier_reputation);
 					
-					if ($res > 0) $nb_update++;
+					if ($res >= 0) $nb_update++;
 					else $nb_error++;
 				}
 				else $nb_not_found++;
@@ -396,6 +400,11 @@ function _updateSupplierPrice(&$db, &$langs, $action)
 	{
 		setEventMessages($langs->trans('quickpriceupdate_errors_found', $nb_error), '', 'errors');
 		return -1;
+	}
+	else
+	{
+		if ($nb_update > 0) setEventMessages($langs->trans('quickpriceupdate_updated_price', $nb_update), '');
+		if ($nb_not_found > 0) setEventMessages($langs->trans('quickpriceupdate_not_found_price', $nb_not_found), '');
 	}
 	
 	return 1;
