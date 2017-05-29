@@ -26,7 +26,7 @@ quickpriceupdate_tarif_success=Mise à jour de %d produits dont %d dates de fin 
 
 
 quickpriceupdate_supplier=Fournisseur
-quickpriceupdate_supplierprice_file=Fichier des nouveaux prix
+quickpriceupdate_supplierprice_file=Fichier CSV des nouveaux prix
 quickpriceupdate_supplierprice_file_help=<u>Format du fichier :</u><br />id produit;réf. produit;<b>NU</b>;<b>NU</b>;réf. produit fournisseur;prix unitaire ht (actuel);prix unitaire ht (nouveau)<br /><br /><b>NU = Non utilisé</b><br />Caractère de séparation "<b>;</b>"<br />Le fichier doit être encodé en UTF-8<br />Si la colonne "id produit" n'esrt pas renseigné alors la référence sera utilisé pour retrouver le produit
 quickpriceupdate_simulate_update_supplierprice=Simuler
 quickpriceupdate_update_supplierprice=Mettre à jour
