@@ -354,6 +354,7 @@ function _updateSupplierPrice(&$db, &$langs, $action)
 	
 	include_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.product.class.php';
 	
+	$TRes = array();
 	$nb_update = $nb_not_found = $nb_error = 0;
 	foreach ($TData as &$line)
 	{
@@ -381,15 +382,28 @@ function _updateSupplierPrice(&$db, &$langs, $action)
 					$res = $object->update_buyprice($r->quantity, $line['new_price']*$r->quantity, $user, 'HT', $supplier, $r->fk_availability, $line['ref_price'], $r->tva_tx, $r->charges, $r->remise_percent, $r->remise, $r->info_bits, $r->delivery_time_days, $r->supplier_reputation);
 					
 					if ($res >= 0) $nb_update++;
-					else $nb_error++;
+					else 
+					{
+						$nb_error++;
+						$TRes['errors'][] = $langs->trans('quickpriceupdate_line_error_on_update', implode(';', $line), $db->lasterror());
+					}
 				}
-				else $nb_not_found++;
+				else
+				{
+					$nb_not_found++;
+					$TRes['warnings'][] = $langs->trans('quickpriceupdate_line_notfound', implode(';', $line), $sql);
+				}
 			}
-			else $nb_error++;
+			else
+			{
+				$nb_error++;
+				$TRes['errors'][] = $langs->trans('quickpriceupdate_line_error_on_select', implode(';', $line), $sql);
+			}
 		}
 		else
 		{
 			$nb_error++;
+			$TRes['errors'][] = $langs->trans('quickpriceupdate_line_error_data', implode(';', $line));
 		}
 	}
 	
@@ -399,7 +413,6 @@ function _updateSupplierPrice(&$db, &$langs, $action)
 	if ($nb_error > 0)
 	{
 		setEventMessages($langs->trans('quickpriceupdate_errors_found', $nb_error), '', 'errors');
-		return -1;
 	}
 	else
 	{
@@ -407,5 +420,5 @@ function _updateSupplierPrice(&$db, &$langs, $action)
 		if ($nb_not_found > 0) setEventMessages($langs->trans('quickpriceupdate_not_found_price', $nb_not_found), '');
 	}
 	
-	return 1;
+	return $TRes;
 }

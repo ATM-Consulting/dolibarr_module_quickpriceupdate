@@ -35,7 +35,13 @@ quickpriceupdate_error_no_supplier_selected=Erreur : le choix d'un fournisseur e
 quickpriceupdate_error_file=Erreur : pas de fichier ou fichier erroné
 quickpriceupdate_supplierprice_file_with_header=Fichier avec une entête à ignorer ?
 
-quickpriceupdate_errors_found=Des erreurs ont été détectées, aucun prix mis à jour
+quickpriceupdate_errors_found=Des erreurs ont été détectées, aucun prix mis à jour (rollback)
 
 quickpriceupdate_updated_price=%d prix mis à jour
 quickpriceupdate_not_found_price=%d prix non trouvé
+
+quickpriceupdate_line_error_data=Erreur [id] et [ref] => %s
+quickpriceupdate_line_error_on_select=Erreur sql => %s (SQL = %s)
+quickpriceupdate_line_error_on_update=Erreur sur la mise à jour du prix => %s (SQL = %s)
+
+quickpriceupdate_line_notfound=Attention prix non trouvé ou ambigus => %s (SQL = %s)

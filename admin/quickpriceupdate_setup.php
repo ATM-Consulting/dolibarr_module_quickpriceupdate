@@ -85,7 +85,7 @@ elseif ($action == 'tarifupdate')
 }
 elseif ($action == 'simulateupdatesupplierprice' || $action == 'updatesupplierprice')
 {
-	_updateSupplierPrice($db, $langs, $action);
+	$TSupplierRes = _updateSupplierPrice($db, $langs, $action);
 }
 /*
  * View
@@ -213,6 +213,9 @@ if ($action == 'simulateupdatesupplierprice') print '<div class="tabsAction"><in
 else print '<div class="tabsAction"><input type="submit" value="'.$langs->trans('quickpriceupdate_simulate_update_supplierprice').'" class="button"></div>';
 
 print '</form>';
+
+if (!empty($TSupplierRes['errors'])) foreach ($TSupplierRes as $err) print '<div class="error">'.$err.'</div>';
+if (!empty($TSupplierRes['warnings'])) foreach ($TSupplierRes as $war) print '<div class="warning">'.$war.'</div>';
 
 llxFooter();
 
