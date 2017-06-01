@@ -83,7 +83,10 @@ elseif ($action == 'tarifupdate')
 {
 	_updateTarif($db, $conf, $langs);
 }
-
+elseif ($action == 'simulateupdatesupplierprice' || $action == 'updatesupplierprice')
+{
+	$TSupplierRes = _updateSupplierPrice($db, $langs, $action);
+}
 /*
  * View
  */
@@ -178,6 +181,41 @@ if (!empty($conf->tarif->enabled) && false) // TODO ajout suite à import des ta
 	print '</form>';	
 }
 
+
+
+print '<hr /><br />';
+
+// TODO show info of simulation
+
+print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'" enctype="multipart/form-data">';
+
+if ($action == 'simulateupdatesupplierprice') print '<input type="hidden" name="action" value="updatesupplierprice" />';
+else print '<input type="hidden" name="action" value="simulateupdatesupplierprice" />';
+
+print '<table class="border" width="100%">';
+
+print '<tr>';
+print '<td class="fieldrequired" width="25%">'.$langs->trans('quickpriceupdate_supplier').'</td>';
+print '<td>'.$form->select_company(GETPOST('fk_supplier'), 'fk_supplier', 's.fournisseur = 1').'</td>';
+print '</tr>';
+print '<tr>';
+print '<td class="fieldrequired" width="25%">'.$form->textwithpicto($langs->transnoentitiesnoconv('quickpriceupdate_supplierprice_file'), $langs->transnoentitiesnoconv('quickpriceupdate_supplierprice_file_help')).'</td>';
+print '<td><input type="file" name="filesupplierprice" value="" /></td>';
+print '</tr>';
+print '<tr>';
+print '<td width="25%">'.$langs->transnoentitiesnoconv('quickpriceupdate_supplierprice_file_with_header').'</td>';
+print '<td><input type="checkbox" name="filewithheader" value="1" '.(GETPOST('filewithheader') ? 'checked="checked"' : '').' /></td>';
+print '</tr>';
+
+print '</table>';
+
+if ($action == 'simulateupdatesupplierprice') print '<div class="tabsAction"><input type="submit" value="'.$langs->trans('quickpriceupdate_update_supplierprice').'" class="button"></div>';
+else print '<div class="tabsAction"><input type="submit" value="'.$langs->trans('quickpriceupdate_simulate_update_supplierprice').'" class="button"></div>';
+
+print '</form>';
+
+if (!empty($TSupplierRes['errors'])) foreach ($TSupplierRes['errors'] as $err) print '<div class="error">'.$err.'</div>';
+if (!empty($TSupplierRes['warnings'])) foreach ($TSupplierRes['warnings'] as $war) print '<div class="warning">'.$war.'</div>';
 
 llxFooter();
 

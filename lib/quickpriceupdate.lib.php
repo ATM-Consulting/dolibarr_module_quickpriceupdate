@@ -314,3 +314,111 @@ function _insertTarif(&$db, &$data, &$max_rowid)
 	
 	return $nb_insert;
 }
+
+
+function _updateSupplierPrice(&$db, &$langs, $action)
+{
+	global $user;
+	
+	$errors = array();
+	
+	$db->begin();
+	
+	include_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.class.php';
+	
+	$fk_supplier = GETPOST('fk_supplier');
+	$supplier = new Fournisseur($db);
+	if ($supplier->fetch($fk_supplier) <= 0) $errors[] = $langs->trans('quickpriceupdate_error_no_supplier_selected');
+	
+	$file = $_FILES['filesupplierprice'];
+	if (empty($file) || $file['error'] > 0) $errors[] = $langs->trans('quickpriceupdate_error_file');
+	
+	$handle = fopen($file['tmp_name'], 'r');
+	if (GETPOST('filewithheader') == 1) $header = fgets($handle);
+	
+	$TData = array();
+	while ($line = fgets($handle))
+	{
+		$line = str_getcsv($line, ';', '"');
+		
+		$TData[] = array(
+			'fk_product' => trim($line[0])
+			,'ref' => trim($line[1])
+			,'ref_price' => trim($line[4])
+			,'old_price' => preg_replace('/[^0-9\.]/', '', price2num($line[5]))
+			,'new_price' => preg_replace('/[^0-9\.]/', '', price2num($line[6]))
+		);
+	}
+	
+	fclose($handle);
+	
+	include_once DOL_DOCUMENT_ROOT.'/fourn/class/fournisseur.product.class.php';
+	
+	$TRes = array();
+	$nb_update = $nb_not_found = $nb_error = 0;
+	foreach ($TData as &$line)
+	{
+		$object = new ProductFournisseur($db);
+		if ($line['fk_product'] > 0 || $line['ref'])
+		{
+			$res = $object->fetch($line['fk_product'], $line['ref']);
+		
+			if ($res < 0) $nb_error++;
+			elseif ($res == 0) $nb_not_found++;
+			
+			$sql = 'SELECT pfp.rowid, pfp.quantity, pfp.fk_availability, pfp.tva_tx, pfp.charges, pfp.remise_percent, pfp.remise, pfp.info_bits, pfp.delivery_time_days';
+			if ((float) DOL_VERSION >= 4.0) $sql.= ', pfp.supplier_reputation';
+			else ', \'\' as supplier_reputation';
+			$sql.= ' FROM '.MAIN_DB_PREFIX.'product_fournisseur_price pfp WHERE fk_soc = '.$supplier->id.' AND ref_fourn = \''.$line['ref_price'].'\' AND unitprice = '.$line['old_price'];
+			
+			$resql = $db->query($sql);
+			if ($resql)
+			{
+				$num = $db->num_rows($resql);
+				if ($num == 1)
+				{
+					$r = $db->fetch_object($resql);
+					$object->product_fourn_price_id = $r->rowid;
+					$res = $object->update_buyprice($r->quantity, $line['new_price']*$r->quantity, $user, 'HT', $supplier, $r->fk_availability, $line['ref_price'], $r->tva_tx, $r->charges, $r->remise_percent, $r->remise, $r->info_bits, $r->delivery_time_days, $r->supplier_reputation);
+					
+					if ($res >= 0) $nb_update++;
+					else 
+					{
+						$nb_error++;
+						$TRes['errors'][] = $langs->trans('quickpriceupdate_line_error_on_update', implode(';', $line), $db->lasterror());
+					}
+				}
+				else
+				{
+					$nb_not_found++;
+					$TRes['warnings'][] = $langs->trans('quickpriceupdate_line_notfound', implode(';', $line), $sql);
+				}
+			}
+			else
+			{
+				$nb_error++;
+				$TRes['errors'][] = $langs->trans('quickpriceupdate_line_error_on_select', implode(';', $line), $sql);
+			}
+		}
+		else
+		{
+			$nb_error++;
+			$TRes['errors'][] = $langs->trans('quickpriceupdate_line_error_data', implode(';', $line));
+		}
+	}
+	
+	if ($action == 'simulateupdatesupplierprice' || $nb_error > 0) $db->rollback();
+	else $db->commit();
+	
+	if ($nb_error > 0)
+	{
+		setEventMessages($langs->trans('quickpriceupdate_errors_found', $nb_error), '', 'errors');
+	}
+	else
+	{
+		if ($nb_update > 0) setEventMessages($langs->trans('quickpriceupdate_updated_price', $nb_update), '');
+		if ($nb_not_found > 0) setEventMessages($langs->trans('quickpriceupdate_not_found_price', $nb_not_found), '');
+	}
+	
+	return $TRes;
+}
