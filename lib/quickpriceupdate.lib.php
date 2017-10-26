@@ -341,12 +341,15 @@ function _updateSupplierPrice(&$db, &$langs, $action)
 	{
 		$line = str_getcsv($line, ';', '"');
 		
+		$new_price = preg_replace('/[^0-9\.]/', '', price2num($line[6]));
+		if (empty($new_price)) continue;
+
 		$TData[] = array(
 			'fk_product' => trim($line[0])
 			,'ref' => trim($line[1])
 			,'ref_price' => trim($line[4])
 			,'old_price' => preg_replace('/[^0-9\.]/', '', price2num($line[5]))
-			,'new_price' => preg_replace('/[^0-9\.]/', '', price2num($line[6]))
+			,'new_price' => $new_price
 		);
 	}
 	
